@@ -1,0 +1,8 @@
+openssl*
+!*.res
+*.o
+*.or
+*.obj
+*.ppu
+*.exe
+*.dll

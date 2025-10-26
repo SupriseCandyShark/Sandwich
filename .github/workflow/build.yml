@@ -1,0 +1,77 @@
+name: Sandwich Build
+
+on:
+    # workflow_dispatch:
+    push:
+        branches: [dev, main]
+
+
+jobs:
+    build:
+        strategy:
+            fail-fast: false
+            matrix:
+                build:
+                    # Linux amd64 构建
+                    - name: "Sandwich-Linux-amd64"
+                      platform: "linux/amd64"
+                      os: "ubuntu-latest"
+                      realOs: "Linux-amd64"
+                    # Windows amd64 构建
+                    - name: "Sandwich-Windows-amd64"
+                      platform: "windows/amd64"
+                      os: "windows-latest"
+                      realOs: "Windows-amd64"
+                    # macOS 通用 构建
+                    - name: "Sandwich-macOS-universal"
+                      platform: "darwin/universal"
+                      os: "macos-latest"
+                      realOs: "macOS-universal"
+                    # Linux arm 构建
+                    - name: "Sandwich-Linux-arm64"
+                      platform: "linux/arm64"
+                      os: "ubuntu-24.04-arm"
+                      realOs: "Linux-arm64"
+                    # Windows arm 构建
+                    - name: "Sandwich-Windows-arm64"
+                      platform: "windows/arm64"
+                      os: "windows-11-arm"
+                      realOs: "Windows-arm64"
+
+        runs-on: ${{ matrix.build.os }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  submodules: recursive
+            - name: Read Version
+              id: version
+              shell: bash
+              run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+            - name: Install FPC Windows
+              if: runner.os == 'Windows'
+              run: |
+                  choco install Lazarus
+              shell: pwsh
+            - name: Install FPC macOS
+              if: runner.os == 'macOS'
+              run: |
+                  brew update
+                  brew install fpc
+            - name: Install FPC Linux
+              if: runner.os == 'Linux'
+              run: |
+                  export DEBIAN_FRONTEND=noninteractive
+                  sudo apt-get update -y
+                  sudo apt-get install -y fpc
+            # 使用 FPC Actions 构建并打包
+            - name: Compiler Program
+              uses: suve/GHActions-FPC@trunk
+              with:
+                  flags: '-XX -Os -CX -Xs -o"Sandwich-${{steps.version.outputs.version}}-${{matrix.build.realOs}}"'
+                  source: 'Main.dpr'
+            - name: Upload Artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: Sandwich-${{steps.version.outputs.version}}-${{matrix.build.realOs}}-Bundle
+                  path: ./Sandwich-${{steps.version.outputs.version}}-${{matrix.build.realOs}}
