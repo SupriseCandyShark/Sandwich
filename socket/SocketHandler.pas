@@ -6,6 +6,8 @@ interface
 uses
   SysUtils, Classes, {$IFDEF WINDOWS}WinSock2, {$ENDIF}Sockets;
 
+implementation
+
 {$IF DEFINED(WINDOWS) OR DEFINED(DARWIN)}
 const
   IPPROTO_IPV6 = 41;
