@@ -6,6 +6,7 @@ interface
 uses
   SysUtils, Classes, {$IFDEF WINDOWS}WinSock2, {$ENDIF}Sockets;
 
+function GetMCPort(): String;
 implementation
 
 {$IF DEFINED(WINDOWS) OR DEFINED(DARWIN)}
