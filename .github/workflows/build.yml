@@ -113,14 +113,14 @@ jobs:
               uses: suve/GHActions-FPC@trunk
               with:
                   fpc: C:\FPC\bin\aarch64-win64\fpc.exe
-                  flags: -XX -Os -CX -Xs -Parm -oSandwich-${{steps.version.outputs.version}}-WinCE-arm.exe
+                  flags: -XX -Os -CX -Xs -Paarch64 -oSandwich-${{steps.version.outputs.version}}-WinCE-arm.exe
                   source: PascalScaffolding.lpr
             # 打包 DLL
             - name: Compiler Program DLL
               uses: suve/GHActions-FPC@trunk
               with:
                   fpc: C:\FPC\bin\aarch64-win64\fpc.exe
-                  flags: -XX -Os -CX -Xs -Cg -WD -Parm -oSandwich-${{steps.version.outputs.version}}-WinCE-arm.dll
+                  flags: -XX -Os -CX -Xs -Cg -WD -Paarch64 -oSandwich-${{steps.version.outputs.version}}-WinCE-arm.dll
                   source: PascalScaffoldingLibrary.lpr
             # 上传工件 EXE
             - name: Upload Artifact EXE
