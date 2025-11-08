@@ -160,9 +160,9 @@ __declspec(dllimport) char* __stdcall JoinEasytier(char* corePath, char* roomId,
 > Result: 如果正确 node 到，将会返回一个 JSON 格式的字符串，其中包括：\
 > ```json
 > {
->   "inst_id": "<STRING>",
->   "hostname": "<STRING>",
->   "ipv4_addr": "<STRING>"
+>   "inst_id": "<STRING>", // Easytier ID
+>   "hostname": "<STRING>", // 主机名
+>   "ipv4_addr": "<STRING>" // 当前 IPv4 地址
 > }
 > ```
 > 如果返回空字符串，则说明你做错了！你需要先调用 CreateEasytier 或者 JoinEasytier 之后再说！
