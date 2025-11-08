@@ -92,6 +92,7 @@ jobs:
                   # 默认下载 3.3.1 的
                   Invoke-WebRequest -Uri "https://downloads.freepascal.org/fpc/snapshot/trunk/aarch64-win64/fpc-3.3.1.aarch64-win64.built.on.x86_64-linux.tar.gz" -OutFile "fpc-aarch64-win64.tar.gz"
                   # 解压 tar.gz 压缩包（为了让以下 actions 识别到是最新的 3.2.2，因此这里填入 3.2.2！）
+                  mkdir C:\FPC\3.2.2
                   tar -xzf .\fpc-aarch64-win64.tar.gz -C C:\FPC\3.2.2
                   cd C:\FPC\3.2.2
                   Get-ChildItem
