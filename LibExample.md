@@ -70,6 +70,7 @@ __declspec(dllimport) char* __stdcall GetEasytierUrl();
 
 ```c
 __declspec(dllimport) char* __stdcall GetEasytierNode(int page, int pageSize);
+```
 
 ## 密码相关
 
@@ -81,10 +82,7 @@ __declspec(dllimport) char* __stdcall RandomRoomId();
 
 2. 校验邀请码：
 
-> 返回值是 Boolean，只是 1 或 0。不会返回别的！
-
 ```c
-#define C_BOOL int
 __declspec(dllimport) C_BOOL __stdcall ValidateRoomId(char* roomId);
 ```
 
@@ -106,7 +104,7 @@ __declspec(dllimport) char* __stdcall GetMachineCode();
 
 > 如果返回空，则说明要么是用户没有启动 MC，要么是用户的 UDP 连接协议较旧。\
 > 注意，该函数会导致主线程至少停滞一分钟，用于检测 MC 端口！因此，请新开一个线程执行该函数！不要直接使用主线程！【除非你写的是 cli 程序】\
-> 可以自行转换成 Integer！只会返回 1024 - 65535 之间的值！如果出现不属于这里面的值，或者在 转换成 Integer 时出错了，那就直接告诉用户输入错误！
+> 可以自行转换成 Integer！只会返回 1024 - 65535 之间的值！如果出现不属于这里面的值，或者在 转换成 Integer 时出错了，那就直接告诉用户读取失败，并让用户手动输入端口！
 
 ```c
 __declspec(dllimport) char* __stdcall GetMCPort();
@@ -116,17 +114,15 @@ __declspec(dllimport) char* __stdcall GetMCPort();
 
 > [!WARNING]
 > 可能会误杀掉 Spring Boot 启动的项目，甚至是 HMCL 启动器！请不要乱用！\
-> 整个 dll 唯一无返回值的程序！
+> 整个 dll 唯二无返回值的函数！
 
 ```c
 __declspec(dllimport) void __stdcall KillJavaInstance();
 ```
 
-## Easytier 相关
+## Easytier 程序相关
 
-1. 暂未想好
-
-2. 创建 Easytier 网络（并尝试打开 TCP 连接）：
+1. 创建 Easytier 网络（并尝试打开 TCP 连接）：
 
 > 参数列表：\
 > corePath: easytier-core 的路径\
@@ -147,7 +143,7 @@ __declspec(dllimport) char* __stdcall CreateEasytier(char* corePath, char* roomI
 > 调用完了之后，会在本机开放 TCP 连接，后面你需要自己循环对协议内容进行ping和校验。这边建议查看一下协议：[Scaffolding](https://github.com/Scaffolding-MC/Scaffolding-MC)\
 > 协议内容待会说
 
-3. 加入 Easytier 网络（请在加入完成之后立即发送 c:player_ping），库会帮你校验协议内容的！
+2. 加入 Easytier 网络（请在加入完成之后立即发送 c:player_ping），库会帮你校验协议内容的！
 
 > 参数列表描述和返回值与上述一致，只是唯一一点不同的就是，加入方无需对本机开放 TCP 连接！\
 > 该函数将不会附带 mcPort！
@@ -156,7 +152,7 @@ __declspec(dllimport) char* __stdcall CreateEasytier(char* corePath, char* roomI
 __declspec(dllimport) char* __stdcall JoinEasytier(char* corePath, char* roomId, char* nodeUrl);
 ```
 
-4. 获取 Easytier node 内容：
+3. 获取 Easytier node 内容：
 
 > 参数列表：\
 > cliPath: easytier-cli 的路径\
@@ -175,6 +171,17 @@ __declspec(dllimport) char* __stdcall JoinEasytier(char* corePath, char* roomId,
 __declspec(dllimport) char* __stdcall GetEasytierNode(char* cliPath);
 ```
 
+4. 销毁 Easytier 实例（并取消 TCP 组播）！
+
+> 参数列表：空\
+> 返回值：空\
+> 整个 dll 唯二无返回值的函数！\
+> 如果没有进行 CreateEasytier 或是 JoinEasytier，则什么也不会发生。。
+
+```c
+__declspec(dllimport) void __stdcall KillEasytierInstance();
+```
+
 ## 协议相关
 
 > 在上述函数中，已经给了各位如何获取本机识别码的信息了。这里将不再赘述！\
@@ -190,7 +197,8 @@ __declspec(dllimport) char* __stdcall GetEasytierNode(char* cliPath);
 > machineId: 在上述获取~\
 > etInstId: 获取上述 node，之后提取出里面的 inst_id，填到这里\
 > 返回值：\
-> Result: 如果返回 false，则说明联机中心已退出，或者你网断了。。否则全部都是返回 true！
+> Result: 如果返回 false，则说明联机中心已退出，或者你网断了。。否则全部都是返回 true！\
+> 当返回值但凡出现为 false，请立刻销毁 Easytier 实例，随后弹出弹窗警告用户！
 
 ```c
 __declspec(dllimport) C_BOOL __stdcall CPlayerPing(char* ip, char* playerName, char* machineId, char* etInstId);
