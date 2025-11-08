@@ -90,7 +90,7 @@ begin
     addr6.sin6_port := hTons(4445);
     addr6.sin6_addr := StrToNetAddr6('::1');
     if {$IFDEF WINDOWS}bind{$ELSE}fpBind{$ENDIF}(socket6, @addr6, SizeOf(addr6)) < 0 then begin Result := 'F' + IntToStr({$IFDEF WINDOWS}WSAGetLastError{$ELSE}SocketError{$ENDIF}); Exit; end;
-    mreq6.ipv6mr_interface := 0;
+    mreq6.ipv6mr_interface := {$IFDEF FREEBSD}1{$ELSE}0{$ENDIF};
     mreq6.ipv6mr_multiaddr := StrToNetAddr6('ff75:230::60');
     if {$IFDEF WINDOWS}setSockOpt{$ELSE}fpSetSockOpt{$ENDIF}(socket6, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, @mreq6, SizeOf(mreq6)) < 0 then begin Result := 'E' + IntToStr({$IFDEF WINDOWS}WSAGetLastError{$ELSE}SocketError{$ENDIF}); Exit; end;
     //if SocketError <> 0 then begin Result := 'G' + IntToStr(SocketError); Exit; end;

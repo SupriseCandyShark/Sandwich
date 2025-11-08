@@ -6,9 +6,11 @@ program PascalScaffolding;
  * 那么，这里是 Scaffolding 的 Free Pascal 实现源码，在许可证允许的范围内，尽情使用它！
  *)
 {$mode objfpc}{$H+}
+{
 {$IF NOT DEFINED(NO_OPENSSL) AND DEFINED(WIN64)}
 {$R openssl.res}
 {$ENDIF}
+//}
 
 uses
   {$IFDEF UNIX}
@@ -17,6 +19,8 @@ uses
   {$ENDIF}
   SysUtils,
   Classes,
+  SocketHandler in 'socket/SocketHandler.pas'
+  {
   RegExpr,
   Zipper,
   Utils in 'utils/Utils.pas',
@@ -24,14 +28,14 @@ uses
   DownloadMethod in 'utils/DownloadMethod.pas',
   LogPascal in 'utils/LogPascal.pas',
   ScfClient in 'scaffolding/ScfClient.pas',
-  SocketHandler in 'socket/SocketHandler.pas'
   {$IF NOT DEFINED(NO_OPENSSL) AND DEFINED(WIN64)}
   // 解压 libeay32 和 ssleay32 时需要用到 Windows 类库。。
   , Windows
-  {$ENDIF};
+  {$ENDIF}//};
 
 // 判断操作系统是否为 Windows x86_64，如果是，则解压一次 libeay32 和 ssleay32！
 // 同时判断是否启用了 NO_OPENSSL，如果启用了，则默认不会解压 libeay32 和 ssleay32！
+{
 {$IF NOT DEFINED(NO_OPENSSL) AND DEFINED(WIN64)}
 procedure ExtractOpensSLLibs();
 begin
@@ -62,7 +66,8 @@ begin
   end;
 end;
 {$ENDIF}
-
+//}
+{
 var
   UserInput: String;
   URLGetContent: String;
@@ -70,10 +75,12 @@ var
   FileName: String;
   FileExt: String;
   WantTo: String;
+//}
 begin
   // writeln('Hello World!');
-  // writeln('Your MC Port is: ' + GetMCPort());
-  // Exit;
+  writeln(GetMCPort());
+  Exit;
+  {
   Log := Log4P.Create();
   Log.Info('Sandwich Is Launched!!');
   {$IF NOT DEFINED(NO_OPENSSL) AND DEFINED(WIN64)}
@@ -201,4 +208,5 @@ begin
       break;
     end;
   end;
+  //}
 end.

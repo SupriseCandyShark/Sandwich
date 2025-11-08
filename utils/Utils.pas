@@ -71,15 +71,13 @@ var
 begin
   {$IF DEFINED(WINDOWS)}
   output := RunCommandSync(['wmic', 'csproduct', 'get', 'uuid']);
-  Result := MD5Print(MD5String(output)).ToUpper;
   {$ELSEIF DEFINED(DARWIN)}
-  output := RunCommandSync(['system_profiler', 'SPHardwareDataType', '|', 'grep', 'Hardware UUID']);
-  Result := MD5Print(MD5String(output)).ToUpper;
+  output := RunCommandSync(['system_profiler', 'SPHardwareDataType']);
+  output := RunCommandSync(['grep', 'Hardware UUID', output]);
   {$ELSE}
   output := RunCommandSync(['cat', '/etc/machine-id']);
-  Result := MD5Print(MD5String(output)).ToUpper;
   {$ENDIF}
-  //Result := '';
+  Result := MD5Print(MD5String(output)).ToUpper;
 end;
 
 // 房间码检索字符串
