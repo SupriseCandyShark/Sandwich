@@ -24,6 +24,7 @@ const
 {$ENDIF}
 
 type
+  TSockLen = LongInt;
   Ip_Mreq = record
     imr_multiaddr: In_Addr;
     imr_interface: In_Addr;
@@ -67,34 +68,33 @@ begin
   begin
     Result := 'Z' + IntToStr(WSAGetLastError);
     Exit;
-    // Writeln('WSAStartup failed. Error: ', WSAGetLastError);
-    // Halt(1);
   end;
   {$ENDIF}
   try
     // 绑定固定端口，进行 Udp 连接
     socket4 := {$IFDEF WINDOWS}socket{$ELSE}fpSocket{$ENDIF}(AF_INET, SOCK_DGRAM, 0);
-    if (socket4 < 0) then begin Result := 'A' + IntToStr(SocketError); Exit; end;
+    if (socket4 < 0) then begin Result := 'A' + IntToStr({$IFDEF WINDOWS}WSAGetLastError{$ELSE}SocketError{$ENDIF}); Exit; end;
     // 开始 bind 链接
     addr.sin_family := AF_INET;
     addr.sin_port := hTons(4445);
     addr.sin_addr.s_addr := hTonl(INADDR_ANY);
-    if {$IFDEF WINDOWS}bind{$ELSE}fpBind{$ENDIF}(socket4, @addr, SizeOf(addr)) < 0 then begin Result := 'B' + IntToStr(SocketError); Exit; end;
+    if {$IFDEF WINDOWS}bind{$ELSE}fpBind{$ENDIF}(socket4, @addr, SizeOf(addr)) < 0 then begin Result := 'B' + IntToStr({$IFDEF WINDOWS}WSAGetLastError{$ELSE}SocketError{$ENDIF}); Exit; end;
     // 加入到多播组
-    mreq.imr_multiaddr := StrToNetAddr('224.0.2.60');
+    mreq.imr_multiaddr.s_addr := hTonl(3758096956); // 224.0.2.60
     mreq.imr_interface.s_addr := hTonl(INADDR_ANY);
-    if {$IFDEF WINDOWS}setSockOpt{$ELSE}fpSetSockOpt{$ENDIF}(socket4, IPPROTO_IP, IP_ADD_MEMBERSHIP, @mreq, SizeOf(mreq)) < 0 then begin Result := 'C' + IntToStr(SocketError); Exit; end;
+    if {$IFDEF WINDOWS}setSockOpt{$ELSE}fpSetSockOpt{$ENDIF}(socket4, IPPROTO_IP, IP_ADD_MEMBERSHIP, @mreq, SizeOf(mreq)) < 0 then begin Result := 'C' + IntToStr({$IFDEF WINDOWS}WSAGetLastError{$ELSE}SocketError{$ENDIF}); Exit; end;
     // 下列 IPv6 同理
     socket6 := {$IFDEF WINDOWS}socket{$ELSE}fpSocket{$ENDIF}(AF_INET6, SOCK_DGRAM, 0);
-    if (socket6 < 0) then begin Result := 'D' + IntToStr(SocketError); Exit; end;
+    if (socket6 < 0) then begin Result := 'D' + IntToStr({$IFDEF WINDOWS}WSAGetLastError{$ELSE}SocketError{$ENDIF}); Exit; end;
     addr6.sin6_family := AF_INET6;
     addr6.sin6_port := hTons(4445);
     addr6.sin6_addr := StrToNetAddr6('::1');
-    if {$IFDEF WINDOWS}bind{$ELSE}fpBind{$ENDIF}(socket6, @addr6, SizeOf(addr6)) < 0 then begin Result := 'F' + IntToStr(SocketError); Exit; end;
+    if {$IFDEF WINDOWS}bind{$ELSE}fpBind{$ENDIF}(socket6, @addr6, SizeOf(addr6)) < 0 then begin Result := 'F' + IntToStr({$IFDEF WINDOWS}WSAGetLastError{$ELSE}SocketError{$ENDIF}); Exit; end;
     mreq6.ipv6mr_interface := 0;
     mreq6.ipv6mr_multiaddr := StrToNetAddr6('ff75:230::60');
-    if {$IFDEF WINDOWS}setSockOpt{$ELSE}fpSetSockOpt{$ENDIF}(socket6, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, @mreq6, SizeOf(mreq6)) < 0 then begin Result := 'E' + IntToStr(SocketError); Exit; end;
-    if SocketError <> 0 then begin Result := 'G' + IntToStr(SocketError); Exit; end;
+    if {$IFDEF WINDOWS}setSockOpt{$ELSE}fpSetSockOpt{$ENDIF}(socket6, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, @mreq6, SizeOf(mreq6)) < 0 then begin Result := 'E' + IntToStr({$IFDEF WINDOWS}WSAGetLastError{$ELSE}SocketError{$ENDIF}); Exit; end;
+    //if SocketError <> 0 then begin Result := 'G' + IntToStr(SocketError); Exit; end;
+    writeln('UDP Launch Success! Then Wait you to open Minecraft Instance!');
     // 开始计数
     count := 0;
     // 开始监听信息

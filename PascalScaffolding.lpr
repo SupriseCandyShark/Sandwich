@@ -69,7 +69,7 @@ var
   WantTo: String;
 begin
   // writeln('Hello World!');
-  writeln(GetMCPort());
+  writeln('Your MC Port is: ' + GetMCPort());
   Exit;
   Log := Log4P.Create();
   Log.Info('Sandwich Is Launched!!');
