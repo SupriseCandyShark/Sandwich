@@ -73,8 +73,8 @@ jobs:
     # 如果有哪位好心人来帮我修改一下 Actions（能够从源码安装 Free Pascal），我会非常感激你们的！
     # 我这边会编译出一份 WinCE for arm (only 32 bits) 版本的 Sandwich，请见谅~~
     # 如果你有需求需要用到 Windows arm 版本的 Sandwich，你需要自行下载 openssl 哦！程序将不会内置！
-    build-wince-arm:
-        name: Build WinCE arm
+    build-windows-arm64:
+        name: Build Windows arm64
         runs-on: windows-11-arm
         steps:
             - name: Checkout
@@ -91,11 +91,9 @@ jobs:
               run: |
                   # 默认下载 3.3.1 的
                   Invoke-WebRequest -Uri "https://downloads.freepascal.org/fpc/snapshot/trunk/aarch64-win64/fpc-3.3.1.aarch64-win64.built.on.x86_64-linux.tar.gz" -OutFile "fpc-aarch64-win64.tar.gz"
-                  # 解压 tar.gz 压缩包（为了让以下 actions 识别到是最新的 3.2.2，因此这里填入 3.2.2！）
-                  mkdir C:\FPC\3.2.2
-                  tar -xzf .\fpc-aarch64-win64.tar.gz -C C:\FPC\3.2.2
-                  cd C:\FPC\3.2.2\bin
-                  Get-ChildItem
+                  # 解压 tar.gz 压缩包
+                  mkdir C:\FPC\
+                  tar -xzf .\fpc-aarch64-win64.tar.gz -C C:\FPC\
             # # 安装 FPC
             # - name: Install FPC Windows
             #   run: |
@@ -114,12 +112,14 @@ jobs:
             - name: Compiler Program EXE
               uses: suve/GHActions-FPC@trunk
               with:
+                  fpc: C:\FPC\bin\aarch64-win64\fpc.exe
                   flags: -XX -Os -CX -Xs -Parm -oSandwich-${{steps.version.outputs.version}}-WinCE-arm.exe
                   source: PascalScaffolding.lpr
             # 打包 DLL
             - name: Compiler Program DLL
               uses: suve/GHActions-FPC@trunk
               with:
+                  fpc: C:\FPC\bin\aarch64-win64\fpc.exe
                   flags: -XX -Os -CX -Xs -Cg -WD -Parm -oSandwich-${{steps.version.outputs.version}}-WinCE-arm.dll
                   source: PascalScaffoldingLibrary.lpr
             # 上传工件 EXE
