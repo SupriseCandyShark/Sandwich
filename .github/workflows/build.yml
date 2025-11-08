@@ -86,20 +86,29 @@ jobs:
               id: version
               shell: bash
               run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
-            # 安装 FPC
-            - name: Install FPC Windows
+            # 从每日快照中拉取 aarch64-win64 版的 FPC
+            - name: Install FPC Arm64
               run: |
-                  # 默认直接下载 3.3.2
-                  Invoke-WebRequest -Uri "https://master.dl.sourceforge.net/project/freepascal/Win32/3.2.2/fpc-3.2.2.i386-win32.exe?viasf=1" -OutFile "fpc-win32.exe"
-                  Start-Process -FilePath "fpc-win32.exe" -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART" -Wait
-              shell: pwsh
-            # 安装 交叉编译器
-            - name: Install Cross Compiler
-              shell: pwsh
-              run: |
-                  # 默认直接下载 3.3.2
-                  Invoke-WebRequest -Uri "https://master.dl.sourceforge.net/project/freepascal/Win32/3.2.2/fpc-3.2.2.i386-win32.cross.arm-wince.exe?viasf=1" -OutFile "fpc-wince.exe"
-                  Start-Process -FilePath "fpc-wince.exe" -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART" -Wait
+                  # 默认下载 3.3.1 的
+                  Invoke-WebRequest -Uri "https://downloads.freepascal.org/fpc/snapshot/trunk/aarch64-win64/fpc-3.3.1.aarch64-win64.built.on.x86_64-linux.tar.gz" -OutFile "fpc-aarch64-win64.tar.gz"
+                  # 解压 tar.gz 压缩包（为了让以下 actions 识别到是最新的 3.2.2，因此这里填入 3.2.2！）
+                  tar -xzf .\fpc-aarch64-win64.tar.gz -C C:\FPC\3.2.2
+                  cd C:\FPC\3.2.2
+                  Get-ChildItem
+            # # 安装 FPC
+            # - name: Install FPC Windows
+            #   run: |
+            #       # 默认直接下载 3.3.2
+            #       Invoke-WebRequest -Uri "https://master.dl.sourceforge.net/project/freepascal/Win32/3.2.2/fpc-3.2.2.i386-win32.exe?viasf=1" -OutFile "fpc-win32.exe"
+            #       Start-Process -FilePath "fpc-win32.exe" -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART" -Wait
+            #   shell: pwsh
+            # # 安装 交叉编译器
+            # - name: Install Cross Compiler
+            #   shell: pwsh
+            #   run: |
+            #       # 默认直接下载 3.3.2
+            #       Invoke-WebRequest -Uri "https://master.dl.sourceforge.net/project/freepascal/Win32/3.2.2/fpc-3.2.2.i386-win32.cross.arm-wince.exe?viasf=1" -OutFile "fpc-wince.exe"
+            #       Start-Process -FilePath "fpc-wince.exe" -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART" -Wait
             # 打包 EXE
             - name: Compiler Program EXE
               uses: suve/GHActions-FPC@trunk
