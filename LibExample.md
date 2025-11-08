@@ -100,6 +100,7 @@ function JoinEasytier(corePath, roomId: PChar): PChar; stdcall;
 > "hostname": "<STRING>",
 > "ipv4_addr": "<STRING>"
 > }
+> 如果返回空字符串，则说明你做错了！你需要先调用 CreateEasytier 或者 JoinEasytier 之后再说！
 
 ```pascal
 function GetEasytierNode(cliPath: PChar); PChar; stdcall;
@@ -107,9 +108,9 @@ function GetEasytierNode(cliPath: PChar); PChar; stdcall;
 
 ## 协议相关
 
-> 在上述函数中，已经给了各位如何获取本机识别码的信息了。这里将不再赘述！
-
-> 以下函数均需要房主和房客共同调用（
+> 1. 在上述函数中，已经给了各位如何获取本机识别码的信息了。这里将不再赘述！
+> 2. 以下调用均需要在本机已经开启 TCP 之后才能调用，否则不予调用！不仅会返回一次值，还会向 TCP 服务器广播一次！也就是说，你必须调用一次 CreateEasytier 或者 JoinEasytier 之后才能使用下列函数
+> 3. 以下函数均需要房主和房客共同调用（如果出现任何调用失败，将会返回空字符串！不会抛出报错！
 
 1. c:player_ping
 
@@ -173,4 +174,13 @@ function CProtocol(ip: PChar): PChar; stdcall;
 
 ```pascal
 function CPlayerProfileList(ip: PChar): PChar; stdcall;
+```
+
+6. c:player_easytier_id
+
+> 返回 Easytier ID，用于上方的 player ping 调用！当然，其他房客也可以通过这个函数获取到您的 easyter id！
+> 返回值：返回 Easytier ID
+
+```pascal
+function CPlayerEasytierID(ip: PChar): PChar; stdcall;
 ```
