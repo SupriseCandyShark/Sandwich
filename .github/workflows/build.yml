@@ -94,7 +94,7 @@ jobs:
                   # 解压 tar.gz 压缩包（为了让以下 actions 识别到是最新的 3.2.2，因此这里填入 3.2.2！）
                   mkdir C:\FPC\3.2.2
                   tar -xzf .\fpc-aarch64-win64.tar.gz -C C:\FPC\3.2.2
-                  cd C:\FPC\3.2.2
+                  cd C:\FPC\3.2.2\bin
                   Get-ChildItem
             # # 安装 FPC
             # - name: Install FPC Windows
