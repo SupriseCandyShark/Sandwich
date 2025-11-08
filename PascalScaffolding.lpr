@@ -72,8 +72,8 @@ var
   WantTo: String;
 begin
   // writeln('Hello World!');
-  writeln('Your MC Port is: ' + GetMCPort());
-  Exit;
+  // writeln('Your MC Port is: ' + GetMCPort());
+  // Exit;
   Log := Log4P.Create();
   Log.Info('Sandwich Is Launched!!');
   {$IF NOT DEFINED(NO_OPENSSL) AND DEFINED(WIN64)}
