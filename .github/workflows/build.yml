@@ -95,7 +95,6 @@ jobs:
                   # 解压 tar.gz 压缩包
                   mkdir C:\FPC\
                   tar -xzf .\fpc-aarch64-win64.tar.gz -C C:\FPC\
-                  C:\FPC\bin\aarch64-win64\fpc.exe -iV
             # # 安装 FPC
             # - name: Install FPC Windows
             #   run: |
@@ -111,19 +110,23 @@ jobs:
             #       Invoke-WebRequest -Uri "https://master.dl.sourceforge.net/project/freepascal/Win32/3.2.2/fpc-3.2.2.i386-win32.cross.arm-wince.exe?viasf=1" -OutFile "fpc-wince.exe"
             #       Start-Process -FilePath "fpc-wince.exe" -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART" -Wait
             # 打包 EXE
-            - name: Compiler Program EXE
-              uses: suve/GHActions-FPC@trunk
-              with:
-                  fpc: C:\FPC\bin\aarch64-win64\fpc.exe
-                  flags: -XX -Os -CX -Xs -Paarch64 -oSandwich-${{steps.version.outputs.version}}-WinCE-arm.exe
-                  source: PascalScaffolding.lpr
-            # 打包 DLL
-            - name: Compiler Program DLL
-              uses: suve/GHActions-FPC@trunk
-              with:
-                  fpc: C:\FPC\bin\aarch64-win64\fpc.exe
-                  flags: -XX -Os -CX -Xs -Cg -WD -Paarch64 -oSandwich-${{steps.version.outputs.version}}-WinCE-arm.dll
-                  source: PascalScaffoldingLibrary.lpr
+            # - name: Compiler Program EXE
+            #   uses: suve/GHActions-FPC@trunk
+            #   with:
+            #       fpc: C:\FPC\bin\aarch64-win64\fpc.exe
+            #       flags: -XX -Os -CX -Xs -Paarch64 -oSandwich-${{steps.version.outputs.version}}-WinCE-arm.exe
+            #       source: PascalScaffolding.lpr
+            # # 打包 DLL
+            # - name: Compiler Program DLL
+            #   uses: suve/GHActions-FPC@trunk
+            #   with:
+            #       fpc: C:\FPC\bin\aarch64-win64\fpc.exe
+            #       flags: -XX -Os -CX -Xs -Cg -WD -Paarch64 -oSandwich-${{steps.version.outputs.version}}-WinCE-arm.dll
+            #       source: PascalScaffoldingLibrary.lpr
+            # 直接运行 FPC 编译
+            - name: Run FPC Program EXE
+              run: |
+                  C:\FPC\bin\aarch64-win64\fpc.exe -XX -Os -CX -Xs -Cg -WD -Paarch64 -oSandwich-${{steps.version.outputs.version}}-WinCE-arm.dll PascalScaffoldingLibrary.lpr
             # 上传工件 EXE
             - name: Upload Artifact EXE
               uses: actions/upload-artifact@v4
