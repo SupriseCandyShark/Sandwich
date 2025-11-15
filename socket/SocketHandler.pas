@@ -4,7 +4,7 @@ unit SocketHandler;
 interface
 
 uses
-  SysUtils, Classes, {$IFDEF WINDOWS}WinSock2, {$ENDIF}Sockets;
+  SysUtils, Classes, {$IFDEF WINDOWS}WinSock2, {$ELSE}BaseUnix, {$ENDIF}Sockets;
 
 function GetMCPort(): String;
 implementation
@@ -60,6 +60,8 @@ var
   len: LongInt;
   ResultString: String;
   count: Integer;
+  // 非阻塞模式
+  flags: {$IFDEF WINDOWS}UInt64{$ELSE}Integer{$ENDIF};
 begin
   Result := '';
   // Windows 相关
@@ -74,6 +76,14 @@ begin
     // 绑定固定端口，进行 Udp 连接
     socket4 := {$IFDEF WINDOWS}socket{$ELSE}fpSocket{$ENDIF}(AF_INET, SOCK_DGRAM, 0);
     if (socket4 < 0) then begin Result := 'A' + IntToStr({$IFDEF WINDOWS}WSAGetLastError{$ELSE}SocketError{$ENDIF}); Exit; end;
+    // 设置非阻塞模式
+    {$IFDEF WINDOWS}
+    flags := 1;
+    if ioCtlSocket(socket4, FIONBIO, @flags) < 0 then begin Result := 'P' + IntToStr({$IFDEF WINDOWS}WSAGetLastError{$ELSE}SocketError{$ENDIF}); Exit; end;
+    {$ELSE}
+    flags := fpFcntl(socket4, F_GETFL, 0);
+    if fpFcntl(socket4, F_SETFL, flags or O_NONBLOCK) < 0 then begin Result := 'P' + IntToStr({$IFDEF WINDOWS}WSAGetLastError{$ELSE}SocketError{$ENDIF}); Exit; end;
+    {$ENDIF}
     // 开始 bind 链接
     addr.sin_family := AF_INET;
     addr.sin_port := hTons(4445);
@@ -86,12 +96,19 @@ begin
     // 下列 IPv6 同理
     socket6 := {$IFDEF WINDOWS}socket{$ELSE}fpSocket{$ENDIF}(AF_INET6, SOCK_DGRAM, 0);
     if (socket6 < 0) then begin Result := 'D' + IntToStr({$IFDEF WINDOWS}WSAGetLastError{$ELSE}SocketError{$ENDIF}); Exit; end;
+    {$IFDEF WINDOWS}
+    flags := 1;
+    if ioCtlSocket(socket6, FIONBIO, @flags) < 0 then begin Result := 'P' + IntToStr({$IFDEF WINDOWS}WSAGetLastError{$ELSE}SocketError{$ENDIF}); Exit; end;
+    {$ELSE}
+    flags := fpFcntl(socket6, F_GETFL, 0);
+    if fpFcntl(socket6, F_SETFL, flags or O_NONBLOCK) < 0 then begin Result := 'P' + IntToStr({$IFDEF WINDOWS}WSAGetLastError{$ELSE}SocketError{$ENDIF}); Exit; end;
+    {$ENDIF}
     addr6.sin6_family := AF_INET6;
     addr6.sin6_port := hTons(4445);
-    addr6.sin6_addr := StrToNetAddr6('::1');
+    addr6.sin6_addr := StrToNetAddr6('::1'); // 这里还是用到了 Sockets 的内容。。如果有懂 C++ 或者 Pascal 的人，来帮帮我把这个函数去掉！这样在 Windows 里面就不用再 uses Sockets 的内容了！将大大减少了体积！
     if {$IFDEF WINDOWS}bind{$ELSE}fpBind{$ENDIF}(socket6, @addr6, SizeOf(addr6)) < 0 then begin Result := 'F' + IntToStr({$IFDEF WINDOWS}WSAGetLastError{$ELSE}SocketError{$ENDIF}); Exit; end;
     mreq6.ipv6mr_interface := {$IFDEF FREEBSD}1{$ELSE}0{$ENDIF};
-    mreq6.ipv6mr_multiaddr := StrToNetAddr6('ff75:230::60');
+    mreq6.ipv6mr_multiaddr := StrToNetAddr6('ff75:230::60'); // 还有这里，不好意思~~
     if {$IFDEF WINDOWS}setSockOpt{$ELSE}fpSetSockOpt{$ENDIF}(socket6, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, @mreq6, SizeOf(mreq6)) < 0 then begin Result := 'E' + IntToStr({$IFDEF WINDOWS}WSAGetLastError{$ELSE}SocketError{$ENDIF}); Exit; end;
     //if SocketError <> 0 then begin Result := 'G' + IntToStr(SocketError); Exit; end;
     writeln('UDP Launch Success! Then Wait you to open Minecraft Instance!');
@@ -102,7 +119,7 @@ begin
     begin
       fromLen := SizeOf(fromAddr);
       len := {$IFDEF WINDOWS}recvFrom{$ELSE}fpRecvFrom{$ENDIF}(socket4, @buffer, SizeOf(buffer), 0, @fromAddr, @fromLen);
-      if len > 0 then
+      if len >= 0 then
       begin
         SetString(ResultString, buffer, len);
         Result := ResultString.SubString(ResultString.IndexOf('[AD]') + 4);
@@ -111,16 +128,16 @@ begin
       end;
       fromLen := SizeOf(fromAddr6);
       len := {$IFDEF WINDOWS}recvFrom{$ELSE}fpRecvFrom{$ENDIF}(socket6, @buffer, SizeOf(buffer), 0, @fromAddr6, @fromLen);
-      if len > 0 then
+      if len >= 0 then
       begin
         SetString(ResultString, buffer, len);
         Result := ResultString.SubString(ResultString.IndexOf('[AD]') + 4);
         Result := Result.SubString(0, Result.IndexOf('[/AD]'));
         Exit;
       end;
-      if count = 60 then
+      if count = 59 then
       begin
-        Result := 'Sorry, Cannot find your Port, Please Enter it manual:';
+        Result := 'Q';
         Exit;
       end;
       Sleep(1000);

@@ -1,4 +1,4 @@
-library PascalScaffolding;
+library PascalScaffoldingLibrary;
 
 begin
 

@@ -4,11 +4,11 @@
 
 本篇文章仅适用于开发者，不适用于用户和使用者。在使用本类库时，你需要注意以下几点：
 
-1. 在以下函数表示，字符串均用 char\*，数字均用 int，指针均用 &xxx，bool 也用 int 但是只会使用 0 和 1 两个返回值！，为了兼容 C99！
+1. 在以下函数表示，字符串均用 char\*，数字均用 int，指针均用 &xxx，bool 也用 int 但是只会使用 0 和 1 两个返回值，为了兼容 C99！
 2. 目前本类库暂时无需指定结构体的，各位大可放心！所有 JSON 均使用字符串返回，不使用结构体！
-3. 下载 Release 中的 dll 或者 dylib 又或者 so，随后将其绑定至您的程序，再然后请按需求调用以下函数即可！
+3. 下载 Release 中的 DYNAMIC 并且解压，你会得到对应操作系统的 dll 或者 dylib 又或者 so，随后将其绑定至您的程序，再然后请按需求调用以下函数即可！
 
-> 请先在程序开头写上这样一串话：
+> 如果你使用 C 语言开发，请先在程序开头写上这样一串话：
 > ```c
 > #define C_BOOL int
 > ```
@@ -27,8 +27,7 @@ __declspec(dllimport) char* __stdcall GetEasytierUrl();
 
 2. 获取 Easytier 官方的节点列表
 
-> 参数列表：
-> 
+> 参数列表：\
 > page：页数\
 > pageSize：页面大小
 >
@@ -67,6 +66,8 @@ __declspec(dllimport) char* __stdcall GetEasytierUrl();
 >   }
 > ]
 > ```
+> 
+> 返回的字符串可很长，也很可能会占用非常多的内存空间！记得在使用完后立刻释放哦！如果你不想要这么大的，你也可以将 pageSize 改小一点~
 
 ```c
 __declspec(dllimport) char* __stdcall GetEasytierNode(int page, int pageSize);
@@ -102,7 +103,7 @@ __declspec(dllimport) char* __stdcall GetMachineCode();
 
 1. 获取当前正在启动的 MC 实例（并且打开了局域网开放）的端口：
 
-> 如果返回空，则说明要么是用户没有启动 MC，要么是用户的 UDP 连接协议较旧。\
+> 如果返回空，则说明要么是用户没有启动 MC 并打开局域网连接，要么是用户的 UDP 连接协议较旧。\
 > 注意，该函数会导致主线程至少停滞一分钟，用于检测 MC 端口！因此，请新开一个线程执行该函数！不要直接使用主线程！【除非你写的是 cli 程序】\
 > 可以自行转换成 Integer！只会返回 1024 - 65535 之间的值！如果出现不属于这里面的值，或者在 转换成 Integer 时出错了，那就直接告诉用户读取失败，并让用户手动输入端口！
 
@@ -131,16 +132,17 @@ __declspec(dllimport) void __stdcall KillJavaInstance();
 > nodeUrl: 节点URL列表（可以通过上方 GetEasytierNode 获取）。
 > 返回值：\
 > Result：返回虚拟联机大厅的 IP 和 端口（如果获取失败将返回错误信息，你可以判断返回值里面是否包含冒号来判断是否出错！）
+> 返回值示例：`10.1.1.0:23333`
 
 > [!WARNING]
-> nodeURL 传入的 nodeUrl 列表格式是 `["<node1>","<node2>","node3"]` 的 JSON 形式！如果只有一个 URL 的话，也要传入列表！如果你需要传入官方的节点列表或者自建列表，也可以在这里面新增！
->
+> nodeURL 传入的 nodeUrl 列表格式是 `["<node1>","<node2>","node3"]` 的 JSON 形式！如果只有一个 URL 的话，也要传入列表！如果你需要传入官方的节点列表或者自建列表，也可以在这里面新增！\
+> 如果列表为空或者传入的字符串不正确，或者传入不正确的 URL，将会返回错误信息！
 
 ```c
 __declspec(dllimport) char* __stdcall CreateEasytier(char* corePath, char* roomId, char* nodeUrl, char* mcPort);
 ```
 
-> 调用完了之后，会在本机开放 TCP 连接，后面你需要自己循环对协议内容进行ping和校验。这边建议查看一下协议：[Scaffolding](https://github.com/Scaffolding-MC/Scaffolding-MC)\
+> 调用完了之后，会在本机开放 TCP 连接，后面你需要自己循环对协议内容进行 ping 和校验。这边建议查看一下协议：[Scaffolding](https://github.com/Scaffolding-MC/Scaffolding-MC)\
 > 协议内容待会说
 
 2. 加入 Easytier 网络（请在加入完成之后立即发送 c:player_ping），库会帮你校验协议内容的！

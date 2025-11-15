@@ -19,6 +19,8 @@
 
 ## 程序功能
 
+请下载 `EXECUTE` 版本的 `Sandwich`！如果你要将其绑定到您的程序当中，你也可以下载 `DYNAMIC` 并参考[类库制作](./LibExample.md)文档里的内容！
+
 下载并解压，你会得到文件：`sandwich.exe`(Windows) 或者 `sandwich`(Unix)，请自行根据操作系统运行程序。
 
 双击并运行 `sandwich` 可执行文件，并根据指示进行下一步操作，放心，很容易懂的！
