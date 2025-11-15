@@ -88,12 +88,14 @@ jobs:
               run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
             # 从每日快照中拉取 aarch64-win64 版的 FPC
             - name: Install FPC Arm64
+              shell: "pwsh"
               run: |
                   # 默认下载 3.3.1 的
                   Invoke-WebRequest -Uri "https://downloads.freepascal.org/fpc/snapshot/trunk/aarch64-win64/fpc-3.3.1.aarch64-win64.built.on.x86_64-linux.tar.gz" -OutFile "fpc-aarch64-win64.tar.gz"
                   # 解压 tar.gz 压缩包
                   mkdir C:\FPC\
                   tar -xzf .\fpc-aarch64-win64.tar.gz -C C:\FPC\
+                  C:\FPC\bin\aarch64-win64\fpc.exe -iV
             # # 安装 FPC
             # - name: Install FPC Windows
             #   run: |
@@ -324,14 +326,14 @@ jobs:
                   sync: nfs
                   # 安装 FPC
                   prepare: |
-                    pkg update
-                    pkg install -y fpc
+                      pkg update
+                      pkg install -y fpc
                   # 打包 EXE 和 DLL
                   run: |
-                    cd $GITHUB_WORKSPACE
-                    fpc -iV
-                    fpc -XX -Os -CX -Xs -Px86_64 -Tfreebsd -oSandwich-${{steps.version.outputs.version}}-freeBSD-x86_64 PascalScaffolding.lpr
-                    fpc -XX -Os -CX -Xs -Cg -fPIC -Px86_64 -Tfreebsd -oSandwich-${{steps.version.outputs.version}}-freeBSD-x86_64.so PascalScaffoldingLibrary.lpr
+                      cd $GITHUB_WORKSPACE
+                      fpc -iV
+                      fpc -XX -Os -CX -Xs -Px86_64 -Tfreebsd -oSandwich-${{steps.version.outputs.version}}-freeBSD-x86_64 PascalScaffolding.lpr
+                      fpc -XX -Os -CX -Xs -Cg -fPIC -Px86_64 -Tfreebsd -oSandwich-${{steps.version.outputs.version}}-freeBSD-x86_64.so PascalScaffoldingLibrary.lpr
             # 上传工件 EXE
             - name: Upload Artifact
               uses: actions/upload-artifact@v4
