@@ -74,6 +74,7 @@ jobs:
     # 我这边会编译出一份 WinCE for arm (only 32 bits) 版本的 Sandwich，请见谅~~
     # 如果你有需求需要用到 Windows arm 版本的 Sandwich，你需要自行下载 openssl 哦！程序将不会内置！
     build-windows-arm64:
+        if: ${{ false }}
         name: Build Windows arm64
         runs-on: windows-11-arm
         steps:
