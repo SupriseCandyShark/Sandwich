@@ -95,7 +95,7 @@ jobs:
                   Start-Process -FilePath "fpc-win32.exe" -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART" -Wait
             # 从每日快照中拉取 aarch64-win64 版的 FPC
             - name: Install FPC Arm64
-              shell: "pwsh"
+              shell: pwsh
               run: |
                   # 默认下载 3.3.1 的
                   Invoke-WebRequest -Uri "https://downloads.freepascal.org/fpc/snapshot/trunk/aarch64-win64/fpc-3.3.1.aarch64-win64.built.on.x86_64-linux.tar.gz" -OutFile "fpc-aarch64-win64.tar.gz"
@@ -103,6 +103,7 @@ jobs:
                   tar -xzf "fpc-aarch64-win64.tar.gz" -C "C:\FPC\3.2.2"
                   # 复制 3.3.1 的 FPC 到 3.2.2 文件夹里面
                   Copy-Item -Path "C:\FPC\3.2.2\bin\aarch64-win64\*" -Destination "C:\FPC\3.2.2\bin\i386-win32" -Recurse -Force
+                  C:\FPC\3.2.2\bin\i386-win32\fpc -iV
             #   shell: pwsh
             # # 安装 交叉编译器
             # - name: Install Cross Compiler
@@ -126,9 +127,9 @@ jobs:
             #       flags: -XX -Os -CX -Xs -Cg -WD -Paarch64 -oSandwich-${{steps.version.outputs.version}}-WinCE-arm.dll
             #       source: PascalScaffoldingLibrary.lpr
             # 直接运行 FPC 编译
-            - name: Run FPC Program EXE
-              run: |
-                  C:\FPC\bin\aarch64-win64\fpc.exe -XX -Os -CX -Xs -Cg -WD -Paarch64 -oSandwich-${{steps.version.outputs.version}}-WinCE-arm.dll PascalScaffoldingLibrary.lpr
+            # - name: Run FPC Program EXE
+            #   run: |
+            #       C:\FPC\bin\aarch64-win64\fpc.exe -XX -Os -CX -Xs -Cg -WD -Paarch64 -oSandwich-${{steps.version.outputs.version}}-WinCE-arm.dll PascalScaffoldingLibrary.lpr
             # 上传工件 EXE
             - name: Upload Artifact EXE
               uses: actions/upload-artifact@v4
