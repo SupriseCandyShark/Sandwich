@@ -56,10 +56,12 @@ sudo pacman -S openssl
 
 ## 注意事项（严重）
 
-由于本程序目前暂时无法编译 `Windows arm64` 版本，只能通过本地交叉编译一份 `WinCE for arm (only 32 bits)` 版本，
+由于本程序目前暂时无法编译 `Windows arm64` 版本，只能通过本地交叉编译一份 `WinCE for arm (only 16 bits)` 版本，
 
-因此，如果你实在有需求在 `Windows arm64` 上使用 `Sandwich` 的话，请尝试下载一次 `WinCE for arm` 版本的，如果运行不了，请提出 `issue`！
+因此，如果你实在有需求在 `Windows arm64` 上使用 `Sandwich` 的话，请尝试下载一次 `WinCE for arm` 版本的，如果运行不了，请耐心等待 `FPC` 支持 `Windows arm64`！当 `FPC` 支持 `Windows arm64` 时，才可以正常进行编译！
+
+如果你想为 `Windows arm64` 做出贡献，只需要修改 `CI CD` 文件，让其支持 `Windows arm64` 即可！目前官网上的[每日构建](https://downloads.freepascal.org/fpc/snapshot/trunk/aarch64-win64/)已经有了 `Windows arm64` 的编译产物，但是当我运行的时候，发生了很严重的意外！它无限递归抛出报错！因此我暂时无法提供版本，如果你懂 `Free Pascal` 的编译原理和构建过程（比如在 `CI CD` 里直接下载源码，并自主构建 `FPC`！），你当然可以为该仓库做出贡献！
 
 在使用 `WinCE for arm` 的过程中，你需要自主下载 `openssl`，因为 Sandwich 不会内置 `arm` 版本的 `openssl`。
 
-其中 `WinCE for arm` 使用的是 `easytier-windows-arm64` 版本的 `easytier` 哦~
+其中 `WinCE for arm` 使用的是 `easytier-windows-arm64` 版本的 `easytier` 哦，但是很可能运行不了，因为 `WinCE for arm` 是 `16 bit` 的操作系统。。
